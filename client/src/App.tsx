@@ -1,25 +1,41 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import "./App.css";
+interface Movie {
+  id: number;
+  title: string;
+}
 
 function App() {
+  const [data, setData] = useState<Movie[]>([] as Movie[]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    callBackendAPI();
-  }, []);
+    getMovies();
 
-  const callBackendAPI = async () => {
-    const response = await fetch("/movies");
-    const body = await response.json();
+    setIsLoading(false);
+  }, [data.length]);
 
-    if (response.status !== 200) {
-      throw Error(body.message);
+  const getMovies = async () => {
+    setIsLoading(true);
+    const response = await fetch("/api/movies"); //will go to http://localhost:5000/api/movies because proxy is set in package.json to 5000
+
+    if (response.status === 200) {
+      const data = await response.json();
+      setData(data.movies);
+    } else {
+      setError("Error fetching movies");
     }
-    return body;
   };
 
   return (
     <div className="App">
       <p>Forefront movie database</p>
+      {isLoading && <p>Loading...</p>}
+      {data &&
+        Array.from(data).map((movie) => <p key={movie.id}>{movie.title}</p>)}
+
+      {error && !data && <p>{error}</p>}
     </div>
   );
 }

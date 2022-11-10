@@ -18,8 +18,7 @@ function App() {
 
   const getMovies = async () => {
     setIsLoading(true);
-    const response = await fetch("/api/movies"); //will go to http://localhost:5000/api/movies because proxy is set in package.json to 5000
-
+    const response = await fetch("/api/movies");
     if (response.status === 200) {
       const data = await response.json();
       setData(data.movies);
